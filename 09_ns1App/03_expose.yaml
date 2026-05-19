@@ -28,3 +28,6 @@ spec:
     weight: 100
   port:
     targetPort: 8090
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
