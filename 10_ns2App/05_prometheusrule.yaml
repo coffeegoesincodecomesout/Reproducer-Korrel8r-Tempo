@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: example-alert
+  namespace: ns2-uwl
+spec:
+  groups:
+  - name: threepilar-uwl-ns2
+    rules:
+    - alert: TestappFrontendConnectionCount
+      for: 1m
+      expr: ping_request_count{job="threepilar-frontend-service"} > 0
+      labels:
+        severity: warning
+    - alert: TestappBackendResponseCount
+      for: 1m
+      expr: ping_response_request_count{job="threepilar-backend-service"} > 0
+      labels:
+        severity: warning

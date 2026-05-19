@@ -1,0 +1,18 @@
+apiVersion: monitoring.openshift.io/v1
+kind: AlertingRule
+metadata:
+  name: netobserv-alerts
+  namespace: openshift-monitoring
+spec:
+  groups:
+  - name: NetObservAlerts
+    rules:
+    - alert: TestappNetObservIncomingBandwidth
+      annotations:
+        message: |-
+          {{ $labels.job }}: incoming traffic exceeding 1 MBps for 30s on {{ $labels.DstK8S_OwnerType }} {{ $labels.DstK8S_OwnerName }} ({{ $labels.DstK8S_Namespace }}).
+        summary: "High incoming traffic."
+      expr: sum(rate(netobserv_workload_ingress_bytes_total {SrcK8S_Namespace="openshift-ingress", DstK8S_Namespace=~"ns1.*"}[1m])) by (job, DstK8S_Namespace, DstK8S_OwnerName, DstK8S_OwnerType) > 1
+      for: 30s
+      labels:
+        severity: warning

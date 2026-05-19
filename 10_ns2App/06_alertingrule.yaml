@@ -1,0 +1,31 @@
+apiVersion: loki.grafana.com/v1
+kind: AlertingRule
+metadata:
+  name: threepilars-ns2-logging-alert
+  namespace: ns2-uwl
+  labels:
+    openshift.io/log-alerting: 'true'
+spec:
+  groups:
+    - interval: 1m
+      name: threepilars-ns2-logging-alert
+      rules:
+        - alert: TestappFrontendLogRallyCount
+          annotations:
+            description: Rally count
+            summary: ping pong is being played
+          expr: >
+            sum(rate({kubernetes_namespace_name="ns2-uwl", kubernetes_pod_name=~"threepilar-uwl-frontend.*"} |= "info"[1m])) > 0.01
+          for: 1m
+          labels:
+            severity: warning
+        - alert: TestappBackendLogResponseCount
+          annotations:
+            description: Response count
+            summary: backend is serving responses
+          expr: >
+            sum(rate({kubernetes_namespace_name="ns2-uwl", kubernetes_pod_name=~"threepilar-uwl-backend.*"} |= "info"[1m])) > 0.01
+          for: 1m
+          labels:
+            severity: warning
+  tenantID: application

@@ -1,0 +1,8 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: netobserv-bucket-odf
+  namespace: netobserv-loki
+spec:
+  generateBucketName: netobserv-bucket-odf
+  storageClassName: openshift-storage.noobaa.io

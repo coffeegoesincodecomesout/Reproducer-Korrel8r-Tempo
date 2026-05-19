@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: threepilar-example
+    openshift.io/log-alerting: 'true'
+  name: threepilar-uwl-example-app
+  namespace: ns1-uwl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: threepilar-example
+  template:
+    metadata:
+      labels:
+        app: threepilar-example
+
+    spec:
+      containers:
+      - image: quay.io/rhn_support_nigsmith/testapp-threepilars:latest
+        imagePullPolicy: IfNotPresent
+        name: threepilar-example
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://otel-collector.opentelemetry.svc.cluster.local:4317"
+        - name: OTEL_SERVICE_NAME
+          value: "threepilar-app"

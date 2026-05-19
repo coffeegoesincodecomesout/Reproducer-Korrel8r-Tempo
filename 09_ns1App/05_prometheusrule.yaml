@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: example-alert
+  namespace: ns1-uwl
+spec:
+  groups:
+  - name: threepilar-uwl-example
+    rules:
+    - alert: TestappConnectionCount
+      for: 1m
+      expr: ping_request_count{job="threepilar-example-service"} > 0
+      labels:
+        severity: warning

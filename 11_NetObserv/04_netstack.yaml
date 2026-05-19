@@ -1,0 +1,66 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: monitoring-plugin-policy
+  namespace: openshift-monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: monitoring-plugin
+  ingress:
+    - from:
+        - podSelector: {}
+          namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-console
+  policyTypes:
+    - Ingress
+---
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: loki
+  namespace: netobserv-loki
+spec:
+  size: 1x.demo
+  storage:
+    schemas:
+    - version: v13
+      effectiveDate: '2022-06-01'
+    secret:
+      name: netobserv-loki-odf
+      type: s3
+  storageClassName: gp3-csi
+  tenants:
+    mode: openshift-network
+---
+apiVersion: flows.netobserv.io/v1beta2
+kind: FlowCollector
+metadata:
+  name: cluster
+spec:
+  namespace: netobserv
+  deploymentModel: Service
+  networkPolicy:
+    enable: true
+  agent:
+    type: eBPF
+    ebpf:
+      sampling: 50
+      privileged: false
+      features: []
+  processor:
+    addZone: false
+    subnetLabels:
+      openShiftAutoDetect: true
+      customLabels: []
+    consumerReplicas: 3
+  loki:
+    enable: true
+    mode: LokiStack
+    lokiStack:
+      name: loki
+      namespace: netobserv-loki
+  consolePlugin:
+    enable: true
+  exporters: []

@@ -1,0 +1,70 @@
+apiVersion: perses.dev/v1alpha1
+kind: PersesDashboard
+metadata:
+  labels:
+    app.kubernetes.io/name: perses-dashboard
+    app.kubernetes.io/instance: testapp-dashboard
+    app.kubernetes.io/part-of: perses-operator
+  name: testapp-dashboard
+  namespace: ns1-uwl
+spec:
+  display:
+    name: testapp-dashboard
+  panels:
+    a2ac7e4112c54062aea66f26eefebd44:
+      kind: Panel
+      spec:
+        display:
+          name: Logs containing "ping"
+        plugin:
+          kind: LogsTable
+          spec:
+            allowWrap: true
+            enableDetails: true
+            showTime: true
+        queries:
+          - kind: LogQuery
+            spec:
+              plugin:
+                kind: LokiLogQuery
+                spec:
+                  query: '{ log_type="application" } |= `ping`'
+    f4af08324228409681948732e13bde11:
+      kind: Panel
+      spec:
+        display:
+          name: ping request count
+        plugin:
+          kind: TimeSeriesChart
+          spec: {}
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: ping_request_count
+  layouts:
+    - kind: Grid
+      spec:
+        display:
+          title: Panel Group
+          collapse:
+            open: true
+        items:
+          - x: 0
+            "y": 8
+            width: 24
+            height: 11
+            content:
+              $ref: "#/spec/panels/a2ac7e4112c54062aea66f26eefebd44"
+          - x: 0
+            "y": 0
+            width: 24
+            height: 8
+            content:
+              $ref: "#/spec/panels/f4af08324228409681948732e13bde11"
+  variables: []
+  duration: 1h
+  refreshInterval: 30s
+  datasources: {}
